@@ -1,1 +1,1 @@
-https://beta-03b2.github.io/made-AI-tetris
+https://alpha03b1.github.io/made-AI-tetris/
