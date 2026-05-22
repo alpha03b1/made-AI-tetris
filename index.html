@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>本格カスタムテトリス - ぷよテト風仕様</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>TETRIS CUSTOM</h1>
+    
+    <div class="container">
+        <div class="side-panel">
+            <div class="box">
+                <h3>HOLD</h3>
+                <canvas id="hold-canvas" width="100" height="100"></canvas>
+            </div>
+            <div class="box">
+                <h3>TIME</h3>
+                <div id="timer-val">00:00</div>
+            </div>
+            <div class="box">
+                <h3>SPEED</h3>
+                <div id="speed-val">Lv.1</div>
+            </div>
+        </div>
+
+        <div class="game-wrapper">
+            <canvas id="game-canvas" width="300" height="600"></canvas>
+            <div id="effect-overlay"></div>
+            <div id="game-over-screen">
+                <h2>GAME OVER</h2>
+                <p>スコア: <span id="final-score">0</span></p>
+                <button class="action-btn" onclick="resetGame()">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="box">
+                <h3>NEXT</h3>
+                <canvas id="next-canvas" width="100" height="420"></canvas>
+            </div>
+            <div class="box">
+                <h3>SCORE</h3>
+                <div id="score-val">0</div>
+            </div>
+            <div class="box">
+                <h3>LINES</h3>
+                <div id="lines-val">0</div>
+            </div>
+            <button class="action-btn" id="start-btn" onclick="togglePause()">START</button>
+            <button class="action-btn btn-retry" id="retry-btn" onclick="resetGame()">RETRY</button>
+        </div>
+    </div>
+
+    <div class="config-panel">
+        <h2>キーボードショートカット設定 (自動保存)</h2>
+        <p class="config-desc">ボタンをクリックした後に、割り当てたいキーを押してください。</p>
+        <div class="key-grid">
+            <div class="key-row"><span>左移動:</span><button class="key-btn" id="cfg-moveLeft" onclick="changeKey('moveLeft')">ArrowLeft</button></div>
+            <div class="key-row"><span>右移動:</span><button class="key-btn" id="cfg-moveRight" onclick="changeKey('moveRight')">ArrowRight</button></div>
+            <div class="key-row"><span>ソフトドロップ:</span><button class="key-btn" id="cfg-softDrop" onclick="changeKey('softDrop')">ArrowDown</button></div>
+            <div class="key-row"><span>ハードドロップ:</span><button class="key-btn" id="cfg-hardDrop" onclick="changeKey('hardDrop')">Space</button></div>
+            <div class="key-row"><span>右回転 (順):</span><button class="key-btn" id="cfg-rotRight" onclick="changeKey('rotRight')">KeyX</button></div>
+            <div class="key-row"><span>左回転 (逆):</span><button class="key-btn" id="cfg-rotLeft" onclick="changeKey('rotLeft')">KeyZ</button></div>
+            <div class="key-row"><span>ホールド:</span><button class="key-btn" id="cfg-hold" onclick="changeKey('hold')">ShiftLeft</button></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
