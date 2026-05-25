@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "DEFAULT_KB_CONFIG": {
     "moveLeft": ["ArrowLeft", "KeyA"],
@@ -17,4 +18,25 @@
     "rotLeft": ["B0"],
     "hold": ["B4", "B5"]
   }
+=======
+{
+  "DEFAULT_KB_CONFIG": {
+    "moveLeft": ["ArrowLeft", "KeyA"],
+    "moveRight": ["ArrowRight", "KeyD"],
+    "softDrop": ["ArrowDown", "KeyS"],
+    "hardDrop": ["ArrowUp"],
+    "rotRight": ["KeyX", "KeyE"],
+    "rotLeft": ["KeyZ", "KeyQ"],
+    "hold": ["ShiftLeft", "KeyC"]
+  },
+  "DEFAULT_GP_CONFIG": {
+    "moveLeft": ["B14", "LX-"],
+    "moveRight": ["B15", "LX+"],
+    "softDrop": ["B13", "LY+"],
+    "hardDrop": ["B12"],
+    "rotRight": ["B1"],
+    "rotLeft": ["B0"],
+    "hold": ["B4", "B5"]
+  }
+>>>>>>> bd8962d4817978002ab93fd10853fc0c915d6d54
 }
