@@ -1,344 +1,466 @@
-/* ==========================================================================
-   1. 全体設定 & 基本レイアウト
-   ========================================================================== */
+/* ==========================================
+   全体の基本デザインスタイル（レスポンシブ対応）
+   ========================================== */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    background-color: #1a1a1a;
+    background: #1a1a1a;
     color: #fff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     user-select: none;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
-h1 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 32px;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(255,255,255,0.1);
-}
-
-.container {
+/* ゲーム画面全体を包むコンテナ */
+#game-container {
     display: flex;
-    gap: 20px;
-    align-items: flex-start;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    align-items: center;
     justify-content: center;
+    gap: 15px;
+    position: relative;
+    max-width: 100%;
 }
 
-/* ==========================================================================
-   2. サイドパネル & スコア情報ボックス
-   ========================================================================== */
+/* サイドのパーツ（HOLD, NEXT, スタッツ） */
 .side-panel {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    min-width: 120px;
+    gap: 12px;
+    width: 130px;
+    flex-shrink: 0;
 }
 
-.box {
-    background: #2a2a2a;
-    border: 2px solid #444;
+.panel-box {
+    background: #222;
+    border: 2px solid #333;
     border-radius: 6px;
-    padding: 12px;
+    padding: 8px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-.box h3 { 
-    margin: 0 0 6px 0; 
-    font-size: 13px; 
-    color: #aaa; 
+.panel-box h3 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #aaa;
     letter-spacing: 1px;
-    text-transform: uppercase;
 }
 
-.box div { 
-    font-size: 20px; 
-    font-weight: bold; 
-    font-family: 'Courier New', Courier, monospace;
-    color: #00ffcc;
-}
-
-/* ==========================================================================
-   3. メインゲーム画面 & キャンバス
-   ========================================================================== */
-.game-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 6px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
-}
-
+/* キャンバス要素 */
 canvas {
-    background: #111;
-    border: 4px solid #333;
-    border-radius: 4px;
+    background: #000;
     display: block;
-    transition: filter 0.05s ease, border-color 0.05s ease;
-}
-
-#hold-canvas, #next-canvas {
-    background: #111;
-    border: 1px solid #444;
-    margin-top: 5px;
+    margin: 0 auto;
     border-radius: 4px;
+    max-width: 100%;
 }
 
-/* T-SPIN回転時の瞬間的な光（フラッシュ）効果 */
-.tspin-flash {
-    filter: brightness(1.8) contrast(1.2);
-    border-color: #a000f0 !important;
+/* ホールドが使用済みでロックされている時の灰色化 */
+#hold-canvas.disabled {
+    filter: grayscale(100%) brightness(50%);
+    opacity: 0.5;
+    transition: filter 0.15s ease, opacity 0.15s ease;
+}
+#hold-canvas {
+    transition: filter 0.15s ease, opacity 0.15s ease;
 }
 
-/* ALL CLEAR時の画面全体フラッシュ効果 */
-.ac-flash {
-    animation: ac-flash-anim 0.5s ease-out;
+/* ステータス数値表示スタイル */
+.stats-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    padding: 10px;
 }
-@keyframes ac-flash-anim {
-    0% { filter: brightness(3.0); }
-    100% { filter: brightness(1.0); }
-}
-
-/* ==========================================================================
-   4. メイン操作ボタン (START / PAUSE / RETRY)
-   ========================================================================== */
-button.action-btn {
-    background: #28a745; 
-    color: white; 
-    border: none;
-    padding: 12px 20px; 
-    font-size: 16px; 
+.stats-box .label {
+    display: block;
+    font-size: 10px;
+    color: #777;
     font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer; 
-    margin-top: 5px;
-    transition: background 0.2s, transform 0.1s;
-    box-shadow: 0 4px 0 #1e7e34;
 }
-
-button.action-btn:hover { 
-    background: #218838; 
-}
-
-button.action-btn.btn-retry {
-    background: #007bff;
-    box-shadow: 0 4px 0 #0056b3;
-}
-button.action-btn.btn-retry:hover {
-    background: #0069d9;
-}
-button.action-btn.btn-retry:active {
-    box-shadow: 0 2px 0 #0056b3;
-}
-
-button.action-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #1e7e34;
-}
-
-/* ==========================================================================
-   5. キーコンフィグ（設定）パネル
-   ========================================================================== */
-.config-panel {
-    margin-top: 30px;
-    background: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    border: 2px solid #444;
-    width: 560px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-.config-panel h2 { 
-    margin-top: 0; 
-    font-size: 18px; 
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
+.stats-box .value {
+    display: block;
+    font-size: 18px;
+    font-family: monospace;
+    font-weight: bold;
     color: #fff;
 }
 
-.config-desc { 
-    font-size: 12px; 
-    color: #aaa; 
-    margin-top: 5px; 
-    margin-bottom: 15px; 
-}
-
-.key-grid { 
-    display: grid; 
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 12px; 
-}
-
-.key-row { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    background: #333; 
-    padding: 6px 12px; 
-    border-radius: 4px; 
-    border: 1px solid #444;
-}
-
-.key-row span {
+/* スタート・全画面用汎用ボタン */
+#start-btn, #fullscreen-btn {
+    width: 100%;
+    padding: 10px;
     font-size: 14px;
-    color: #ddd;
-}
-
-.key-btn {
-    background: #555;
-    color: white;
-    border: 1px solid #666;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    min-width: 110px;
-    text-align: center;
-    font-size: 13px;
     font-weight: bold;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     transition: background 0.2s;
 }
+#start-btn { background: #28a745; }
+#start-btn:hover { background: #218838; }
+#fullscreen-btn { background: #007bff; font-size: 11px; }
+#fullscreen-btn:hover { background: #0056b3; }
 
-.key-btn:hover { 
-    background: #666; 
+/* ==========================================
+   中央メインボード＆画面オーバーレイ
+   ========================================== */
+.main-board-wrapper {
+    position: relative;
+    border: 4px solid #333;
+    border-radius: 6px;
+    background: #000;
+    flex-shrink: 0;
 }
 
-.key-btn:focus { 
-    background: #ff5555; 
-    border-color: #ff3333;
-    outline: none; 
+#game-canvas {
+    border-radius: 0;
+    height: 600px;
+    width: 300px;
 }
 
-/* ==========================================================================
-   6. 特殊演出 & アニメーション効果
-   ========================================================================== */
+/* 特殊演出テキスト用のエフェクトレイヤー */
 #effect-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    overflow: hidden;
     z-index: 5;
 }
 
+/* テキスト演出アニメーション定義 */
 .action-text {
-    font-size: 28px;
-    font-weight: 900;
-    text-shadow: 0 0 10px #000, 0 0 5px #000;
-    animation: pop-fade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    margin-bottom: 5px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0; top: 40%;
+    font-weight: bold;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.8);
+    animation: text-float 0.8s ease-out forwards;
+}
+.txt-tetris    { color: #00ffff; font-size: 28px; }
+.txt-tspin     { color: #ff00ff; }
+.txt-ren       { color: #ffcc00; font-size: 22px; }
+.txt-allclear  { color: #ffffff; font-size: 32px; animation: text-float-long 1.5s ease-out forwards; }
+.txt-system    { color: #aaaaaa; font-size: 20px; }
+
+@keyframes text-float {
+    0%   { transform: translateY(20px) scale(0.5); opacity: 0; }
+    15%  { transform: translateY(0) scale(1.1); opacity: 1; }
+    30%  { transform: translateY(0) scale(1.0); opacity: 1; }
+    100% { transform: translateY(-40px) scale(0.9); opacity: 0; }
+}
+@keyframes text-float-long {
+    0%   { transform: translateY(20px) scale(0.4); opacity: 0; }
+    10%  { transform: translateY(0) scale(1.2); opacity: 1; }
+    80%  { transform: translateY(0) scale(1.0); opacity: 1; }
+    100% { transform: translateY(-20px); opacity: 0; }
 }
 
-.txt-tetris { color: #00f0f0; font-size: 36px; }
-.txt-tspin  { color: #a000f0; }
-.txt-ren    { color: #f0f000; font-size: 24px; }
-.txt-system { color: #ffffff; font-size: 32px; }
+/* ポーズ画面・ゲームオーバー画面の共通全覆い */
+#pause-screen, #game-over-screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+.pause-content, .game-over-content {
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+}
+.pause-content h2 { color: #00ffcc; font-size: 32px; margin-bottom: 5px; }
+.game-over-content h2 { color: #ff3333; font-size: 34px; margin-bottom: 10px; font-weight: 900; }
 
-/* 爆発的なALL CLEAR専用の文字装飾と虹色アニメーション */
-/* 爆発的なALL CLEAR専用の文字装飾と虹色アニメーション */
-.txt-allclear {
-    font-size: 42px;
-    font-weight: 950;
-    letter-spacing: 2px;
-    background: linear-gradient(90deg, #ff0055, #f0a000, #00f000, #00f0f0, #a000f0, #ff0055);
-    background-size: 400% auto;
-    
-    /* 互換性のための切り抜きプロパティ群 */
-    -webkit-background-clip: text; /* 従来のブラウザ・Webkit系用 */
-    background-clip: text;         /* 標準プロパティ（追加） */
-    
-    -webkit-text-fill-color: transparent;
-    animation: 
-        pop-fade-massive 1.5s cubic-bezier(0.15, 0.85, 0.35, 1.2) forwards,
-        rainbow-glow 2s linear infinite;
-    text-shadow: none; 
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+.game-over-content .final-score-lbl {
+    font-size: 11px;
+    color: #888;
+    margin: 5px 0 0 0;
+    letter-spacing: 1px;
+}
+#final-score {
+    font-size: 40px;
+    font-family: monospace;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 0 20px 0;
 }
 
-@keyframes rainbow-glow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 400% 50%; }
+/* ポーズ・ゲームオーバー画面のリトライボタン */
+#retry-btn, #game-over-screen button {
+    margin-top: 15px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: bold;
+    background: #ffc107;
+    color: #111;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: background 0.2s, transform 0.1s;
 }
+#retry-btn:hover { background: #e0a800; }
+#retry-btn:active, #game-over-screen button:active { transform: scale(0.95); }
+#game-over-screen button { background: #ff3333; color: #fff; }
+#game-over-screen button:hover { background: #cc2222; }
 
-@keyframes pop-fade {
-    0% { transform: scale(0.3); opacity: 0; }
-    15% { transform: scale(1.1); opacity: 1; }
-    30% { transform: scale(1.0); opacity: 1; }
-    80% { opacity: 1; transform: translateY(-20px); }
-    100% { opacity: 0; transform: translateY(-40px) scale(0.8); }
-}
+/* ==========================================
+   画面シェイク・発光アニメーション
+   ========================================== */
+.shake { animation: shake-anim 0.15s linear; }
+.shake-massive { animation: shake-massive-anim 0.35s linear; }
+.tspin-flash { animation: tspin-flash-anim 0.06s ease-out 2; }
+.ac-flash { animation: ac-flash-anim 0.4s ease-out; }
 
-/* ALL CLEAR用の巨大で長い滞空時間のアニメーション */
-@keyframes pop-fade-massive {
-    0% { transform: scale(0.1) rotate(-10deg); opacity: 0; }
-    12% { transform: scale(1.3) rotate(5deg); opacity: 1; }
-    25% { transform: scale(1.0) rotate(0deg); opacity: 1; }
-    80% { opacity: 1; transform: scale(1.05) translateY(-10px); }
-    100% { opacity: 0; transform: translateY(-30px) scale(0.5); }
-}
-
-/* 画面シェイク（通常用） */
-.shake { 
-    animation: screen-shake 0.2s ease-in-out; 
-}
-@keyframes screen-shake {
+@keyframes shake-anim {
     0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-4px, 3px); }
-    50% { transform: translate(4px, -2px); }
-    75% { transform: translate(-2px, -3px); }
+    20% { transform: translate(-4px, 3px); }
+    40% { transform: translate(4px, -2px); }
+    60% { transform: translate(-3px, -1px); }
+    80% { transform: translate(3px, 2px); }
 }
-
-/* 画面シェイク（ALL CLEAR用・激しい） */
-.shake-massive {
-    animation: screen-shake-heavy 0.6s ease-in-out;
-}
-@keyframes screen-shake-heavy {
+@keyframes shake-massive-anim {
     0%, 100% { transform: translate(0, 0); }
-    10%, 90% { transform: translate(-8px, 6px) rotate(-1deg); }
-    20%, 80% { transform: translate(8px, -4px) rotate(1deg); }
-    30%, 70% { transform: translate(-5px, -7px) rotate(-1.5deg); }
-    40%, 60% { transform: translate(6px, 5px) rotate(0.5deg); }
-    50% { transform: translate(-2px, 8px) rotate(0deg); }
+    10% { transform: translate(-8px, 6px); }
+    30% { transform: translate(9px, -7px); }
+    50% { transform: translate(-10px, -3px); }
+    70% { transform: translate(8px, 5px); }
+    90% { transform: translate(-4px, -2px); }
+}
+@keyframes tspin-flash-anim {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(2.2) saturate(1.5); }
+}
+@keyframes ac-flash-anim {
+    0% { filter: brightness(3) contrast(1.5); }
+    100% { filter: brightness(1) contrast(1); }
 }
 
 /* ==========================================
-   7. ゲームオーバー画面
+   下部：キーコンフィグセクション
    ========================================== */
-#game-over-screen {
-    position: absolute;
-    top: 180px; 
-    left: 25px; 
-    width: 250px;
-    background: rgba(0, 0, 0, 0.95);
+#sub-controls {
+    margin-top: 30px;
+    background: #222;
     padding: 20px;
-    border: 3px solid #ff5555;
-    border-radius: 10px;
+    border-radius: 8px;
+    width: 640px;
+    border: 1px solid #333;
+    box-sizing: border-box;
+}
+
+.config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.config-header h2 { margin: 0; font-size: 18px; color: #00ffcc; }
+.config-note { font-size: 11px; color: #888; margin: 0 0 15px 0; }
+
+.reset-all-btn {
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.reset-all-btn:hover { background: #5a6268; }
+
+.config-tables-container {
+    display: flex;
+    gap: 20px;
+}
+
+.config-section {
+    flex: 1;
+}
+.config-section h3 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    color: #ccc;
+    border-bottom: 1px solid #444;
+    padding-bottom: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 6px 4px;
+    font-size: 12px;
+    text-align: left;
+}
+th { color: #666; font-weight: normal; border-bottom: 1px solid #333; }
+td:first-child { color: #aaa; width: 90px; }
+
+/* キー設定ボタン */
+.key-btn {
+    display: inline-block;
+    min-width: 140px;
+    min-height: 28px;
+    padding: 4px 10px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 11px;
     text-align: center;
-    display: none;
-    z-index: 10;
-    box-shadow: 0 0 15px rgba(255, 85, 85, 0.5);
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+.key-btn:hover {
+    background: #3a3a3a;
+    border-color: #00ffcc;
+}
+.key-btn.text-left {
+    text-align: left;
 }
 
-#game-over-screen h2 {
-    color: #ff5555;
-    margin-top: 0;
-    font-size: 28px;
-    letter-spacing: 1px;
+.key-btn.config-waiting {
+    background: #dc3545 !important;
+    border-color: #ff0000 !important;
+    color: #fff;
+    animation: pulse-red 1s infinite alternate;
+}
+@keyframes pulse-red {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; box-shadow: 0 0 8px #ff0000; }
 }
 
-#game-over-screen p {
-    font-size: 16px;
-    margin: 15px 0;
-    color: #ddd;
+/* ==========================================
+   🌟 スマートフォン＆フルスクリーン用の最適化
+   ========================================== */
+@media (max-width: 620px) {
+    body {
+        padding: 5px;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    /* 横並びから縦型レイアウトに変更して画面への収まりを最適化 */
+    #game-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 8px;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 360px; /* スマートフォンの標準幅にロック */
+    }
+
+    /* メインボードを最上位に配置、または中央へ固定 */
+    .main-board-wrapper {
+        order: 1;
+    }
+
+    #game-canvas {
+        width: 230px;  /* スマホ画面に合わせて縮小 */
+        height: 460px;
+    }
+
+    /* 左右のパネルをゲーム画面の下側に綺麗にコンパクト整列 */
+    .side-panel {
+        order: 2;
+        flex-direction: row;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .left-panel {
+        justify-content: space-between;
+    }
+    
+    .right-panel {
+        display: none; /* スマホ時はNEXTを省略、またはコンパクトに隠す */
+    }
+
+    .side-panel .panel-box {
+        flex: 1;
+        padding: 4px;
+    }
+
+    .stats-box {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+    }
+    
+    .stats-box > div {
+        flex: 1;
+        min-width: 40%;
+    }
+
+    #hold-canvas {
+        width: 50px;
+        height: 50px;
+    }
+
+    #start-btn, #fullscreen-btn {
+        padding: 6px;
+        font-size: 11px;
+    }
+
+    /* スマホ環境下ではキー設定エリアを最初から自動非表示化 */
+    #sub-controls {
+        display: none !important;
+    }
 }
 
-#final-score {
-    font-weight: bold;
-    color: #00ffcc;
-    font-size: 22px;
+/* 全画面表示（フルスクリーン）モード時の挙動 */
+:fullscreen {
+    background: #111 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:fullscreen #sub-controls {
+    display: none !important;
+}
+
+:fullscreen #game-container {
+    box-shadow: none;
+    background: #111;
+    padding: 10px;
+}
+
+:fullscreen #fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: auto;
+    opacity: 0.2;
+    z-index: 100;
+}
+:fullscreen #fullscreen-btn:hover {
+    opacity: 1;
 }

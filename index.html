@@ -2,68 +2,116 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>本格カスタムテトリス - ぷよテト風仕様</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TETRIS GAME</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>TETRIS CUSTOM</h1>
-    
-    <div class="container">
-        <div class="side-panel">
-            <div class="box">
+    <div id="game-container">
+        <div class="side-panel left-panel">
+            <div class="panel-box">
                 <h3>HOLD</h3>
-                <canvas id="hold-canvas" width="100" height="100"></canvas>
+                <canvas id="hold-canvas" width="120" height="120"></canvas>
             </div>
-            <div class="box">
-                <h3>TIME</h3>
-                <div id="timer-val">00:00</div>
+            
+            <div class="panel-box stats-box">
+                <div>
+                    <span class="label">SCORE</span>
+                    <span id="score-val" class="value">0</span>
+                </div>
+                <div>
+                    <span class="label">LINES</span>
+                    <span id="lines-val" class="value">0</span>
+                </div>
+                <div>
+                    <span class="label">LEVEL</span>
+                    <span id="speed-val" class="value">Lv.1</span>
+                </div>
+                <div>
+                    <span class="label">TIME</span>
+                    <span id="timer-val" class="value">00:00</span>
+                </div>
             </div>
-            <div class="box">
-                <h3>SPEED</h3>
-                <div id="speed-val">Lv.1</div>
-            </div>
+
+            <button id="start-btn" onclick="togglePause()">START</button>
+            <button id="fullscreen-btn" onclick="toggleFullscreen()">全画面 (Ctrl+F)</button>
         </div>
 
-        <div class="game-wrapper">
+        <div class="main-board-wrapper">
             <canvas id="game-canvas" width="300" height="600"></canvas>
+            
             <div id="effect-overlay"></div>
-            <div id="game-over-screen">
-                <h2>GAME OVER</h2>
-                <p>スコア: <span id="final-score">0</span></p>
-                <button class="action-btn" onclick="resetGame()">もう一度プレイ</button>
+
+            <div id="pause-screen" style="display: none;">
+                <div class="pause-content">
+                    <h2>PAUSE</h2>
+                    <p>START または ESC で再開</p>
+                    <button id="retry-btn" onclick="resetGame()">RETRY (Y / △)</button>
+                </div>
+            </div>
+
+            <div id="game-over-screen" style="display: none;">
+                <div class="game-over-content">
+                    <h2>GAME OVER</h2>
+                    <p class="final-score-lbl">SCORE</p>
+                    <p id="final-score">0</p>
+                    <button id="gameover-retry-btn" onclick="resetGame()">TRY AGAIN (A / ×)</button>
+                </div>
             </div>
         </div>
 
-        <div class="side-panel">
-            <div class="box">
+        <div class="side-panel right-panel">
+            <div class="panel-box">
                 <h3>NEXT</h3>
-                <canvas id="next-canvas" width="100" height="420"></canvas>
+                <canvas id="next-canvas" width="100" height="400"></canvas>
             </div>
-            <div class="box">
-                <h3>SCORE</h3>
-                <div id="score-val">0</div>
-            </div>
-            <div class="box">
-                <h3>LINES</h3>
-                <div id="lines-val">0</div>
-            </div>
-            <button class="action-btn" id="start-btn" onclick="togglePause()">START</button>
-            <button class="action-btn btn-retry" id="retry-btn" onclick="resetGame()">RETRY</button>
         </div>
     </div>
 
-    <div class="config-panel">
-        <h2>キーボードショートカット設定 (自動保存)</h2>
-        <p class="config-desc">ボタンをクリックした後に、割り当てたいキーを押してください。</p>
-        <div class="key-grid">
-            <div class="key-row"><span>左移動:</span><button class="key-btn" id="cfg-moveLeft" onclick="changeKey('moveLeft')">ArrowLeft</button></div>
-            <div class="key-row"><span>右移動:</span><button class="key-btn" id="cfg-moveRight" onclick="changeKey('moveRight')">ArrowRight</button></div>
-            <div class="key-row"><span>ソフトドロップ:</span><button class="key-btn" id="cfg-softDrop" onclick="changeKey('softDrop')">ArrowDown</button></div>
-            <div class="key-row"><span>ハードドロップ:</span><button class="key-btn" id="cfg-hardDrop" onclick="changeKey('hardDrop')">Space</button></div>
-            <div class="key-row"><span>右回転 (順):</span><button class="key-btn" id="cfg-rotRight" onclick="changeKey('rotRight')">KeyX</button></div>
-            <div class="key-row"><span>左回転 (逆):</span><button class="key-btn" id="cfg-rotLeft" onclick="changeKey('rotLeft')">KeyZ</button></div>
-            <div class="key-row"><span>ホールド:</span><button class="key-btn" id="cfg-hold" onclick="changeKey('hold')">ShiftLeft</button></div>
+    <div id="sub-controls">
+        <div class="config-header">
+            <h2>キーコンフィグ設定</h2>
+            <button class="reset-all-btn" onclick="clearAllKeyConfigs()">すべての設定を初期化</button>
+        </div>
+        <p class="config-note">※枠をクリックすると入力待ちになります。消去したい場合は、キーボードは「Backspace/Delete」、コントローラーは「R2/RT」を押してください。</p>
+        
+        <div class="config-tables-container">
+            <div class="config-section">
+                <h3>キーボード設定</h3>
+                <table>
+                    <thead>
+                        <tr><th>操作</th><th>割り当てキー</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>左移動</td><td><button id="cfg-kb-moveLeft" class="key-btn text-left" onclick="startConfig('moveLeft','kb')"></button></td></tr>
+                        <tr><td>右移動</td><td><button id="cfg-kb-moveRight" class="key-btn text-left" onclick="startConfig('moveRight','kb')"></button></td></tr>
+                        <tr><td>ソフトドロップ</td><td><button id="cfg-kb-softDrop" class="key-btn text-left" onclick="startConfig('softDrop','kb')"></button></td></tr>
+                        <tr><td>ハードドロップ</td><td><button id="cfg-kb-hardDrop" class="key-btn text-left" onclick="startConfig('hardDrop','kb')"></button></td></tr>
+                        <tr><td>右回転</td><td><button id="cfg-kb-rotRight" class="key-btn text-left" onclick="startConfig('rotRight','kb')"></button></td></tr>
+                        <tr><td>左回転</td><td><button id="cfg-kb-rotLeft" class="key-btn text-left" onclick="startConfig('rotLeft','kb')"></button></td></tr>
+                        <tr><td>ホールド</td><td><button id="cfg-kb-hold" class="key-btn text-left" onclick="startConfig('hold','kb')"></button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="config-section">
+                <h3>コントローラー設定</h3>
+                <table>
+                    <thead>
+                        <tr><th>操作</th><th>割り当てボタン</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>左移動</td><td><button id="cfg-gp-moveLeft" class="key-btn" onclick="startConfig('moveLeft','gp')"></button></td></tr>
+                        <tr><td>右移動</td><td><button id="cfg-gp-moveRight" class="key-btn" onclick="startConfig('moveRight','gp')"></button></td></tr>
+                        <tr><td>ソフトドロップ</td><td><button id="cfg-gp-softDrop" class="key-btn" onclick="startConfig('softDrop','gp')"></button></td></tr>
+                        <tr><td>ハードドロップ</td><td><button id="cfg-gp-hardDrop" class="key-btn" onclick="startConfig('hardDrop','gp')"></button></td></tr>
+                        <tr><td>右回転</td><td><button id="cfg-gp-rotRight" class="key-btn" onclick="startConfig('rotRight','gp')"></button></td></tr>
+                        <tr><td>左回転</td><td><button id="cfg-gp-rotLeft" class="key-btn" onclick="startConfig('rotLeft','gp')"></button></td></tr>
+                        <tr><td>ホールド</td><td><button id="cfg-gp-hold" class="key-btn" onclick="startConfig('hold','gp')"></button></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
